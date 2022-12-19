@@ -19,25 +19,28 @@ export class App extends Component {
     showModal: false,
     isLoading: false,
     error: null,
+    totalHits: 0,
+    total: 0,
+    renderBtn: false,
+    totPages: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
     const prevPage = prevState.page;
     const prevSearchData = prevState.searchData;
-    const { searchData, page, images } = this.state;
+    const { searchData, page } = this.state;
+
     if (prevPage !== page || prevSearchData !== searchData) {
       try {
         this.setState({ isLoading: true });
         const response = fetchImagesWithQuery(searchData, page);
         response.then(data => {
           data.data.hits.length === 0
-            ? toast.error('Nothing found')
-            : data.data.hits.forEach(({ id, webformatURL, largeImageURL }) => {
-                !images.some(image => image.id === id) &&
-                  this.setState(({ images }) => ({
-                    images: [...images, { id, webformatURL, largeImageURL }],
-                  }));
-              });
+            ? this.setState({ renderBtn: false })
+            : this.setState(prevState => ({
+                images: [...prevState.images, ...data.data.hits],
+                renderBtn: true,
+              }));
           this.setState({ isLoading: false });
         });
       } catch (error) {
@@ -60,7 +63,7 @@ export class App extends Component {
     });
   };
 
-  nextPage = () => {
+  nextPage = page => {
     this.setState(({ page }) => ({ page: page + 1 }));
   };
 
@@ -75,9 +78,14 @@ export class App extends Component {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
+  // showLoadMore = () => {
+  //   this.setState({ totPages: Math.ceil(this.state.totalHits / 12) });
+  // };
+
   render() {
     const { toggleModal, openModal, nextPage, onSubmit } = this;
-    const { images, isLoading, largeImage, showModal } = this.state;
+    const { images, isLoading, largeImage, showModal, renderBtn } = this.state;
+    // const showLoadMore = this.showLoadMore();
 
     return (
       <div className={style.App}>
@@ -102,7 +110,7 @@ export class App extends Component {
           />
         )}
         <ToastContainer autoClose={2500} />
-        {images.length >= 12 && <Button nextPage={nextPage} />}
+        {images.length >= 12 && renderBtn && <Button nextPage={nextPage} />}
       </div>
     );
   }

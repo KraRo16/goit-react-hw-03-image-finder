@@ -19,10 +19,10 @@ export default function ImageGallery({ images, openModal }) {
 
 ImageGallery.propTypes = {
   openModal: PropTypes.func.isRequired,
-  images: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      webformatURL: PropTypes.string.isRequired,
-    })
-  ),
+  // images: PropTypes.arrayOf(
+  //   PropTypes.shape({
+  //     id: PropTypes.number.isRequired,
+  //     webformatURL: PropTypes.string.isRequired,
+  //   })
+  // ),
 };

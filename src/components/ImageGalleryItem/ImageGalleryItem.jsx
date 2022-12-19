@@ -16,6 +16,6 @@ export default function ImageGalleryItem({ webformatURL, index, openModal }) {
 
 ImageGalleryItem.propTypes = {
   index: PropTypes.number.isRequired,
-  webformatURL: PropTypes.string.isRequired,
+  // webformatURL: PropTypes.string.isRequired,
   openModal: PropTypes.func.isRequired,
 };
