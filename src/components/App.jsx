@@ -19,10 +19,7 @@ export class App extends Component {
     showModal: false,
     isLoading: false,
     error: null,
-    totalHits: 0,
-    total: 0,
-    renderBtn: false,
-    totPages: 0,
+    isVisible: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -36,10 +33,10 @@ export class App extends Component {
         const response = fetchImagesWithQuery(searchData, page);
         response.then(data => {
           data.data.hits.length === 0
-            ? this.setState({ renderBtn: false })
+            ? toast.error('Ooops')
             : this.setState(prevState => ({
                 images: [...prevState.images, ...data.data.hits],
-                renderBtn: true,
+                isVisible: page < Math.ceil(data.data.totalHits / 12),
               }));
           this.setState({ isLoading: false });
         });
@@ -64,7 +61,10 @@ export class App extends Component {
   };
 
   nextPage = page => {
-    this.setState(({ page }) => ({ page: page + 1 }));
+    this.setState(({ page }) => ({
+      isVisible: false,
+      page: page + 1,
+    }));
   };
 
   openModal = index => {
@@ -78,14 +78,9 @@ export class App extends Component {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  // showLoadMore = () => {
-  //   this.setState({ totPages: Math.ceil(this.state.totalHits / 12) });
-  // };
-
   render() {
     const { toggleModal, openModal, nextPage, onSubmit } = this;
-    const { images, isLoading, largeImage, showModal, renderBtn } = this.state;
-    // const showLoadMore = this.showLoadMore();
+    const { images, isLoading, largeImage, showModal, isVisible } = this.state;
 
     return (
       <div className={style.App}>
@@ -110,7 +105,7 @@ export class App extends Component {
           />
         )}
         <ToastContainer autoClose={2500} />
-        {images.length >= 12 && renderBtn && <Button nextPage={nextPage} />}
+        {isVisible && <Button nextPage={nextPage} onLoad={isLoading} />}
       </div>
     );
   }
